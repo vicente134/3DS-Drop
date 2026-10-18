@@ -50,15 +50,19 @@ Estos códigos QR están alojados directamente en GitHub Releases y **funcionan 
 
 ## 💻 PASO 2: Instalar `3DS-Drop` en tu PC (Windows, Linux y macOS)
 
-### Opción 1: Descargar Ejecutable Directo (Sin instalar nada)
+### Opción 1: Descargar Programa Directo (Sin instalar Python ni usar Terminal)
 Ve a la sección de [**Releases Oficiales en GitHub**](https://github.com/vicente134/3DS-Drop/releases/latest) y descarga el archivo para tu sistema operativo:
-- 🪟 **Windows:** [**Descargar `3DS-Drop-Windows.exe`**](https://github.com/vicente134/3DS-Drop/releases/latest/download/3DS-Drop-Windows.exe) *(Doble clic y listo)*.
+- 🪟 **Windows (ZIP Portable — Recomendado, sin avisos del navegador):** [**Descargar `3DS-Drop-Windows-Portable.zip`**](https://github.com/vicente134/3DS-Drop/releases/latest/download/3DS-Drop-Windows-Portable.zip) *(Descomprímelo y abre `3DS-Drop.exe`)*.
+- 🪟 **Windows (Instalador Setup con icono en Escritorio):** [**Descargar `3DS-Drop-Windows-Setup.exe`**](https://github.com/vicente134/3DS-Drop/releases/latest/download/3DS-Drop-Windows-Setup.exe).
 - 🐧 **Linux:** [**Descargar `3DS-Drop-Linux-x86_64`**](https://github.com/vicente134/3DS-Drop/releases/latest/download/3DS-Drop-Linux-x86_64) *(Hazlo ejecutable y ábrelo)*.
 - 🍎 **macOS:** [**Descargar `3DS-Drop-macOS.zip`**](https://github.com/vicente134/3DS-Drop/releases/latest/download/3DS-Drop-macOS.zip) *(Descomprime `3DS-Drop.app` y ábrelo)*.
 
+> 💡 **Nota sobre el aviso azul de Windows ("Windows protegió su PC" / SmartScreen):**  
+> Como **3DS-Drop** es un proyecto independiente, gratuito y 100% de código abierto (sin un certificado empresarial de pago de Microsoft), la primera vez que lo abras en Windows puede aparecer una ventana azul de *SmartScreen*. Simplemente haz clic en **«Más información»** y luego en **«Ejecutar de todas formas»**.
+
 ---
 
-### Opción 2: Instalador Automático de 1 Clic (Crea el ícono en tu Escritorio / Menú de Apps)
+### Opción 2: Instalador Automático desde el Repositorio (1 Clic)
 Si descargaste o clonaste este repositorio (`git clone https://github.com/vicente134/3DS-Drop.git`), incluye instaladores automáticos que dejan el programa como una aplicación nativa en tu sistema (para no usar nunca la terminal):
 
 - 🪟 **En Windows:** Haz doble clic sobre **`Instalar_Windows.bat`**. Creará automáticamente el acceso directo **`3DS-Drop`** en tu Escritorio.

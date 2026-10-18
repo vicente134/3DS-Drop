@@ -1,28 +1,18 @@
-name: Build PC Executables (Windows, Linux, macOS)
+name: Build Clean PC Installers (Windows, Linux, macOS)
 
 on:
   release:
     types: [published]
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  build-pc:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: windows-latest
-            artifact_name: 3DS-Drop-Windows.exe
-          - os: ubuntu-latest
-            artifact_name: 3DS-Drop-Linux-x86_64
-          - os: macos-latest
-            artifact_name: 3DS-Drop-macOS
-
-    runs-on: ${{ matrix.os }}
-
+  build-windows:
+    runs-on: windows-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -32,26 +22,91 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install dependencies and PyInstaller
+      - name: Install PySide6 and PyInstaller (No UPX to avoid AV false positives)
+        run: |
+          python -m pip install --upgrade pip
+          pip install PySide6 pyinstaller pillow
+
+      - name: Convert icon.png to icon.ico
+        working-directory: pc-client
+        run: |
+          python -c "from PIL import Image; img = Image.open('icon.png'); img.save('icon.ico', sizes=[(256,256),(128,128),(64,64),(48,48),(32,32),(16,16)])"
+
+      - name: Build Clean Windows App (--onedir --noupx with Version Info)
+        working-directory: pc-client
+        run: |
+          pyinstaller --noconfirm --onedir --windowed --noupx --name "3DS-Drop" --icon "icon.ico" --version-file "version_info.txt" --add-data "icon.png;." main.py
+
+      - name: Create Portable ZIP (3DS-Drop-Windows-Portable.zip)
+        run: |
+          powershell -Command "Compress-Archive -Path 'pc-client\dist\3DS-Drop\*' -DestinationPath '3DS-Drop-Windows-Portable.zip' -Force"
+
+      - name: Build Official Windows Setup Installer with Inno Setup
+        run: |
+          cat << 'EOF' > installer.iss
+          [Setup]
+          AppId={{D3D5D20F-8B4A-4F3A-9C1E-3D5D20F00001}
+          AppName=3DS-Drop
+          AppVersion=1.0.0
+          AppPublisher=ElVichoPo
+          AppPublisherURL=https://github.com/vicente134/3DS-Drop
+          DefaultDirName={autopf}\3DS-Drop
+          DefaultGroupName=3DS-Drop
+          PrivilegesRequired=lowest
+          OutputDir=.
+          OutputBaseFilename=3DS-Drop-Windows-Setup
+          SetupIconFile=pc-client\icon.ico
+          Compression=lzma2
+          SolidCompression=yes
+          WizardStyle=modern
+
+          [Languages]
+          Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
+          Name: "english"; MessagesFile: "compiler:Default.isl"
+
+          [Tasks]
+          Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
+
+          [Files]
+          Source: "pc-client\dist\3DS-Drop\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+
+          [Icons]
+          Name: "{group}\3DS-Drop"; Filename: "{app}\3DS-Drop.exe"
+          Name: "{autodesktop}\3DS-Drop"; Filename: "{app}\3DS-Drop.exe"; Tasks: desktopicon
+
+          [Run]
+          Filename: "{app}\3DS-Drop.exe"; Description: "{cm:LaunchProgram,3DS-Drop}"; Flags: nowait postinstall skipifsilent
+          EOF
+          "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss
+
+      - name: Upload Clean Windows Packages to Release v1.0.0
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload v1.0.0 3DS-Drop-Windows-Setup.exe 3DS-Drop-Windows-Portable.zip --clobber
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install PySide6 pyinstaller
 
-      - name: Build Standalone PC App
+      - name: Build Linux Binary (--noupx)
         working-directory: pc-client
         run: |
-          pyinstaller --noconfirm --onefile --windowed --name "3DS-Drop" main.py
+          pyinstaller --noconfirm --onefile --windowed --noupx --name "3DS-Drop" main.py
 
-      - name: Upload to GitHub Release (Windows)
-        if: matrix.os == 'windows-latest'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          move pc-client\dist\3DS-Drop.exe 3DS-Drop-Windows.exe
-          gh release upload v1.0.0 3DS-Drop-Windows.exe --clobber
-
-      - name: Upload to GitHub Release (Linux)
-        if: matrix.os == 'ubuntu-latest'
+      - name: Upload to Release v1.0.0
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -59,8 +114,28 @@ jobs:
           chmod +x 3DS-Drop-Linux-x86_64
           gh release upload v1.0.0 3DS-Drop-Linux-x86_64 --clobber
 
-      - name: Upload to GitHub Release (macOS)
-        if: matrix.os == 'macos-latest'
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install PySide6 pyinstaller
+
+      - name: Build macOS App Bundle (--noupx)
+        working-directory: pc-client
+        run: |
+          pyinstaller --noconfirm --windowed --noupx --name "3DS-Drop" main.py
+
+      - name: Upload to Release v1.0.0
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |

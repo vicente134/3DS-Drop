@@ -1,0 +1,29 @@
+# UTF-8
+VSVersionInfo(
+  ffi=FixedFileInfo(
+    filevers=(1, 0, 0, 0),
+    prodvers=(1, 0, 0, 0),
+    mask=0x3f,
+    flags=0x0,
+    OS=0x40004,
+    fileType=0x1,
+    subtype=0x0,
+    date=(0, 0)
+  ),
+  kids=[
+    StringFileInfo(
+      [
+      StringTable(
+        '040904B0',
+        [StringStruct('CompanyName', 'ElVichoPo (@vicente134)'),
+        StringStruct('FileDescription', '3DS-Drop - Fast Local Network File Transfer for Nintendo 3DS & 2DS'),
+        StringStruct('FileVersion', '1.0.0.0'),
+        StringStruct('InternalName', '3DS-Drop'),
+        StringStruct('LegalCopyright', 'Copyright (C) 2026 ElVichoPo. Open Source MIT License.'),
+        StringStruct('OriginalFilename', '3DS-Drop.exe'),
+        StringStruct('ProductName', '3DS-Drop'),
+        StringStruct('ProductVersion', '1.0.0.0')])
+      ]),
+    VarFileInfo([VarStruct('Translation', [1033, 1200])])
+  ]
+)
