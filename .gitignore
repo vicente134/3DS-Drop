@@ -1,0 +1,13 @@
+# Entornos virtuales y caché de Python
+pc-client/venv/
+__pycache__/
+*.py[cod]
+build/
+dist/
+*.spec
+
+# Artefactos intermedios de compilación 3DS (conservamos .3dsx y .cia listos)
+3ds-homebrew/build/
+3ds-homebrew/*.elf
+3ds-homebrew/*.smdh
+3ds-homebrew/qr_*.png

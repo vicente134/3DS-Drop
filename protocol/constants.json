@@ -1,0 +1,17 @@
+{
+  "protocol_version": 1,
+  "udp_port": 33333,
+  "tcp_port": 33334,
+  "discover_magic": "3DSDROP_DISCOVER",
+  "here_magic": "3DSDROP_HERE",
+  "pc_chunk_size": 65536,
+  "n3ds_sd_buffer_size": 131072,
+  "n3ds_soc_buffer_size": 1048576,
+  "quick_drop_routes": {
+    "/cias": [".cia"],
+    "/3ds": [".3dsx", ".smdh"],
+    "/music": [".mp3", ".ogg", ".wav", ".flac", ".m4a", ".aac"],
+    "/roms": [".nds", ".gba", ".snes", ".sfc", ".nes", ".gb", ".gbc", ".sms", ".md", ".gen"],
+    "/luma/payloads": [".firm"]
+  }
+}

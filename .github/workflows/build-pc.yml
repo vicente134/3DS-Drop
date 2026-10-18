@@ -1,0 +1,70 @@
+name: Build PC Executables (Windows, Linux, macOS)
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-pc:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            artifact_name: 3DS-Drop-Windows.exe
+          - os: ubuntu-latest
+            artifact_name: 3DS-Drop-Linux-x86_64
+          - os: macos-latest
+            artifact_name: 3DS-Drop-macOS
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies and PyInstaller
+        run: |
+          python -m pip install --upgrade pip
+          pip install PySide6 pyinstaller
+
+      - name: Build Standalone PC App
+        working-directory: pc-client
+        run: |
+          pyinstaller --noconfirm --onefile --windowed --name "3DS-Drop" main.py
+
+      - name: Upload to GitHub Release (Windows)
+        if: matrix.os == 'windows-latest'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          move pc-client\dist\3DS-Drop.exe 3DS-Drop-Windows.exe
+          gh release upload v1.0.0 3DS-Drop-Windows.exe --clobber
+
+      - name: Upload to GitHub Release (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mv pc-client/dist/3DS-Drop 3DS-Drop-Linux-x86_64
+          chmod +x 3DS-Drop-Linux-x86_64
+          gh release upload v1.0.0 3DS-Drop-Linux-x86_64 --clobber
+
+      - name: Upload to GitHub Release (macOS)
+        if: matrix.os == 'macos-latest'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd pc-client/dist
+          zip -r ../../3DS-Drop-macOS.zip 3DS-Drop.app
+          cd ../..
+          gh release upload v1.0.0 3DS-Drop-macOS.zip --clobber
